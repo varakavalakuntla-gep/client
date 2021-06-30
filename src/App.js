@@ -1,23 +1,26 @@
 import logo from './logo.svg';
 import './App.css';
+import Notification from './components/Notification';
+import {React, useState} from 'react';
+import { createPluginStore, PluginProvider,RendererPlugin } from "react-pluggable";
+import ShowAlertPlugin from "./components/ShowAlertPlugin.tsx";
+import Header from "./components/Header.tsx";
+
+const pluginStore = createPluginStore();
+pluginStore.install(new RendererPlugin());
+pluginStore.install(new ShowAlertPlugin());
 
 function App() {
+  const [isDisplay, setDisplay] = useState(false);
+  var changeState = function(){
+    setDisplay(!isDisplay);
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Notification isDisplay={isDisplay}/>
+      <PluginProvider pluginStore={pluginStore}>
+        <Header />
+    </PluginProvider>
     </div>
   );
 }

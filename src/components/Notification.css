@@ -1,0 +1,97 @@
+.notificationComponent{
+    float: right;
+    margin: 3px 20px;
+    width: 300px;
+    height: 500px;
+    border: solid #4682B4;
+}
+.header{
+    background-color: #4682B4;
+    padding: 10px;
+    color: white;
+    font-weight: 500;
+}
+
+.notificationMenu{
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: solid 1px #4682B4;
+}
+.active{
+    background-color:#4682B4;
+    color: white !important;
+}
+.notificationMenu span{
+    padding: 3px 10px;
+    margin: 10px 3px;
+    border: solid 1px #4682B4;
+    border-radius: 50px;
+    width: fit-content;
+    font-size: 12px;
+    font-weight: bold;
+    color: #4682B4;
+    cursor: pointer;
+}
+.notificationMenu span:hover{
+    background-color:#4682B4;
+    color: white !important;
+}
+.notificationMenu div{
+    width: -webkit-fill-available;
+    display: flex;
+    justify-content: flex-end;
+}
+.icon{
+    height: 100%;
+    padding: 0 5px;
+}
+.notificationItem{
+    padding-bottom: 5px;
+    border-bottom: solid 1px #4682B4;
+}
+.notificationItem:hover{
+    background-color: #72a0c1;
+    color: white;
+    cursor: pointer;
+}
+.title{
+    text-align: left;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 10px 0 0 0;
+}
+title>input[type="radio"]{
+    border: none;
+}
+input[type="radio"] + *::before{
+    border:none;
+}
+input[type="radio"] + *::after{
+    border:none;
+}
+
+.body{
+    text-align: left;
+    font-size: 12px;
+    padding-left: 20px;
+    margin: 5px 0 0 0;
+}
+.footer{
+    margin-left: 20px;
+    margin-top: 2px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+.footer span{
+    font-size: 12px;
+    padding-top: 10px;
+}
+.forecast{
+    background-color: green;
+    border: solid green;
+    border-radius: 5px;
+    padding: 5px;
+    color: white;
+    cursor: pointer;
+}

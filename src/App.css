@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+.homeHeader{
+  width: 100%;
+  background-color: teal;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+}
+.homeHeader p{
+  left: 10px;
+}
+.notifiIcon{
+  padding-top: 20px;
+  padding-right: 150px;
+  cursor: pointer;
+}
+.headerLeft{
+  display: flex;
+}
+.menu{
+  padding-top: 20px;
+  padding-left: 10px;
+  width: 50px;
+}
