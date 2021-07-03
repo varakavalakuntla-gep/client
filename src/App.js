@@ -5,6 +5,7 @@ import {React, useState} from 'react';
 import { createPluginStore, PluginProvider,RendererPlugin } from "react-pluggable";
 import ShowAlertPlugin from "./components/ShowAlertPlugin.tsx";
 import Header from "./components/Header.tsx";
+import Chat from './components/Chat';
 
 const pluginStore = createPluginStore();
 pluginStore.install(new RendererPlugin());
@@ -17,10 +18,7 @@ function App() {
   }
   return (
     <div className="App">
-      <Notification isDisplay={isDisplay}/>
-      <PluginProvider pluginStore={pluginStore}>
-        <Header />
-    </PluginProvider>
+      <Chat />
     </div>
   );
 }
