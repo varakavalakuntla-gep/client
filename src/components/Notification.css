@@ -1,8 +1,7 @@
 .notificationComponent{
     float: right;
     margin: 3px 20px;
-    width: 300px;
-    height: 500px;
+    width: 320px;
     border: solid #4682B4;
 }
 .header{
@@ -15,7 +14,10 @@
 .notificationMenu{
     display: flex;
     justify-content: flex-start;
+}
+.searchMenu{
     border-bottom: solid 1px #4682B4;
+    padding-bottom: 5px;
 }
 .active{
     background-color:#4682B4;
@@ -49,12 +51,21 @@
     padding-bottom: 5px;
     border-bottom: solid 1px #4682B4;
 }
+.notificationItem div{
+    border: none;
+}
 .notificationItem:hover{
     background-color: #72a0c1;
     color: white;
     cursor: pointer;
 }
+.highlight{
+    font-weight: 700;
+    background-color: #CCEEF4
+    ;
+}
 .title{
+    padding-left: 17px;
     text-align: left;
     font-size: 15px;
     font-weight: bold;
@@ -94,4 +105,86 @@ input[type="radio"] + *::after{
     padding: 5px;
     color: white;
     cursor: pointer;
+}
+
+.Forecast, .Inventory, .Order, .Anouncements, .Unknown{
+    border-radius: 5px;
+    padding: 2px 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    width: fit-content;
+}
+.Forecast{
+    background-color: green;
+    border: solid green;
+}
+.Inventory{
+    background-color: #FF7F50;
+    border: solid #FF7F50;
+}
+.Order{
+    background-color: blue;
+    border: solid blue;
+}
+.Anouncements{
+    background-color: #B8860B;
+    border: solid #B8860B;
+}
+.Unknown{
+    background-color: #A9A9A9;
+    border: solid #A9A9A9;
+}
+
+
+.checkbox{
+    cursor: pointer;
+}
+.newColor{
+    fill: red;
+}
+.nrmlColor{
+    fill: white;
+}
+
+.notificationList{
+    overflow-y: scroll;
+    height: 410px;
+}
+.wrapper {
+    overflow: auto;
+}
+
+.wrapper::-webkit-scrollbar{
+  width: 15px;
+  border-radius: 20px;
+}
+
+.wrapper::-webkit-scrollbar-track{
+  background: #CCEEF4;
+  border-radius: 20px;
+}
+::-webkit-scrollbar-thumb{
+  width: 24px;
+  background: #4682B4;
+  border: 5px solid #CCEEF4;
+  border-radius: 15px;
+}
+
+.searchClass{
+    width: 80%;
+    font-weight: bold;
+}
+.modelBelow{
+    display: flex;
+    justify-content: space-between;
+}
+.modelFooter{
+    padding-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+}
+.hideSearch{
+    display: none;
 }

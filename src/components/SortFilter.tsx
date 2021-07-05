@@ -38,6 +38,7 @@ const Sort: React.FC<SortProps> = ({ open, onClose, settings, setSortSettings })
         }
     }
     const categories = [1, 2, 3, 4]
+    const catergoryNames = ['Forecast','Inventory','Order','Anouncements']
 
     return (
         <div>
@@ -65,7 +66,7 @@ const Sort: React.FC<SortProps> = ({ open, onClose, settings, setSortSettings })
                                         disableRipple
                                     />
                                 </ListItemIcon>
-                                <ListItemText primary={`Category ${c}`} />
+                                <ListItemText primary={catergoryNames[Number(c)-1]} />
                             </ListItem>)
                         })}
 
@@ -73,7 +74,7 @@ const Sort: React.FC<SortProps> = ({ open, onClose, settings, setSortSettings })
                             <Divider />
                         </Box>
                         <Box mt={2}>
-                            <Typography color="textPrimary"> Filter on basis of following categories </Typography>
+                            <Typography color="textPrimary"> sort by date </Typography>
                         </Box>
                         <ListItem dense button onClick={() => { handleSortClick(0) }}>
                             <ListItemIcon>
@@ -85,7 +86,7 @@ const Sort: React.FC<SortProps> = ({ open, onClose, settings, setSortSettings })
 
                                 />
                             </ListItemIcon>
-                            <ListItemText primary={`Sort from new to old`} />
+                            <ListItemText primary={`New to old`} />
                         </ListItem>
                         <ListItem dense button onClick={() => { handleSortClick(1) }}>
                             <ListItemIcon>
@@ -97,16 +98,13 @@ const Sort: React.FC<SortProps> = ({ open, onClose, settings, setSortSettings })
 
                                 />
                             </ListItemIcon>
-                            <ListItemText primary={`Sort from old to new`} />
+                            <ListItemText primary={`Old to new`} />
                         </ListItem>
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => { onClose() }} color="primary">
-                        Cancel
-                    </Button>
                     <Button onClick={() => { onClose() }} color="primary" autoFocus>
-                        Save
+                        Ok
                     </Button>
                 </DialogActions>
             </Dialog>

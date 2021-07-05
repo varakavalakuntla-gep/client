@@ -5,6 +5,7 @@ import { React, useState } from 'react';
 import { createPluginStore, PluginProvider, RendererPlugin } from "react-pluggable";
 import ShowAlertPlugin from "./components/ShowAlertPlugin.tsx";
 import Header from "./components/Header.tsx";
+import Chat from './components/Chat';
 import { blue, orange } from '@material-ui/core/colors';
 import { ThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core'
 
@@ -56,10 +57,7 @@ function App() {
     <ThemeProvider theme={currentTheme}>
       <CssBaseline />
       <div className="App">
-        <Notification isDisplay={isDisplay} />
-        <PluginProvider pluginStore={pluginStore}>
-          <Header />
-        </PluginProvider>
+        <Chat />
       </div>
     </ThemeProvider>
   );

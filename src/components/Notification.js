@@ -1,51 +1,318 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import './Notification.css';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import SearchIcon from '@material-ui/icons/Search';
 import { Box } from "@material-ui/core"
 import Sort from "./SortFilter"
-import { IconButton } from "@material-ui/core"
+import { IconButton, Button } from "@material-ui/core"
 import faker from "faker"
+import Modal from '@material-ui/core/Modal';
+import TextField from '@material-ui/core/TextField';
+import Input from '@material-ui/core/Input';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import AccountCircle from '@material-ui/icons/AccountCircle';
+import { makeStyles } from '@material-ui/core/styles';
+import NotificationModal from './NotificationModel';
 
-const Notification = ({ isDisplay, alert }) => {
+function rand() {
+    return Math.round(Math.random() * 20) - 10;
+  }
+  
+  function getModalStyle() {
+    const top = 50;
+    const left = 50;
+  
+    return {
+      top: `${top}%`,
+      left: `${left}%`,
+      transform: `translate(-${top}%, -${left}%)`,
+    };
+  }
+  
+  const useStyles = makeStyles((theme) => ({
+    paper: {
+      position: 'absolute',
+      width: 400,
+      backgroundColor: theme.palette.background.paper,
+      //border: '2px solid #4682B4',
+      padding: theme.spacing(2, 4, 3),
+    },
+  }));
+
+  const useStylesSearch = makeStyles((theme) => ({
+    root: {
+      '& > *': {
+          width:'90%'
+      },
+    },
+  }));
+
+const Notification = ({  connection }) => {
 
     const [open, setOpen] = React.useState(false)
+    var [alerts,setAlerts] = useState([]);
+    var [allAlerts,setAllAlerts] = useState([]);
+    var [modelUi,setModelui] = useState();
+    var [filterState,setFilterState] = useState('all');
+    var [displaySearch,setSearchDisplay] = useState(false);
+    const [ModelOpen, setModelOpen] = React.useState(false);
+    const [value, setValue] = React.useState('');
     const [sortSettings, setSortSortSettings] = React.useState({
         filters: [1, 2, 3, 4],
-        sort: 1
+        sort: 0
     })
 
-    let alerts = [
-        {
-            title: "Deilveries will be delayed",
-            body: "COVID 19 lockdowns are slowing down deliveries. Usual deadlines not applicable",
-            category: 1,
-            AddedOn: "2021-06-30 15:41:32.237"
-        },
-        {
-            title: "changed Title",
-            body: "COVID 19 lockdowns are slowing down deliveries. Usual deadlines not applicable",
-            category: 2,
-            AddedOn: "2021-06-30 15:41:32.237"
+    async function updateState(stateMethod){
+        setFilterState(stateMethod);
+        send(stateMethod);
+    }
+    useEffect(() => {
+        if (connection) {
+            if(connection.connectionStarted){
+                send(filterState);
+                connection.on('ReceiveMessage', message => {
+                    setAlerts(message);
+                    setAllAlerts(message);
+                    deleverAll(message);
+                });
+            }
+            else
+                connection.start()
+                    .then(result => {
+                        send(filterState);
+                        console.log('Connected!');
+        
+                        connection.on('ReceiveMessage', message => {
+                            setAlerts(message);
+                            setAllAlerts(message);
+                            deleverAll(message);
+                        });
+                    })
+                    .catch(e => console.log('Connection failed: ', e));
         }
-    ];
+    }, [connection]);
 
+    useEffect(() => {
+        if (connection) {
+            if(connection.connectionStarted){
+                connection.on('NewMessage', message => {
+                    //var check = [...alerts1, ...[message]]
+                    //setAlerts(check);
+                    send(filterState);
+
+                });
+            }
+            else
+                connection.start()
+                    .then(result => {
+                        console.log('Connected!');
+        
+                        connection.on('NewMessage', message => {
+                            //var check = [...alerts1, ...[message]]
+                            //setAlerts(check);
+                            send(filterState);
+                        });
+                    })
+                    .catch(e => console.log('Connection failed: ', e));
+        }
+    }, [connection]);
+
+    async function send(stateMethod){
+        if (connection.connectionStarted) {
+            try {
+                await connection.invoke('SendMessage',stateMethod);
+            }
+            catch(e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+    }
+
+    function getTime(datetime){
+        var year = Number((datetime.substring(0,4)));
+        var month = Number((datetime.substring(5,7)));
+        var day = Number((datetime.substring(8,10)))
+        const current = new Date();
+        const cuyear = current.getFullYear();
+        const cuMonth = current.getMonth()+1;
+        const cuDay = current.getDate()
+        if(year < cuyear){
+            return cuyear-year + " years ago"
+        }
+        else if(month < cuMonth){
+            return cuMonth - month +" months ago"
+        }
+        else if(day < cuDay){
+            return cuDay - day +" days ago"
+        }
+        else{
+            return "Today"
+        }
+        console.log(cuyear)
+    }
+    function getCategory(category){
+        var field = '';
+        switch(category){
+            case 1: field = "Forecast"; break;
+            case 2: field = "Inventory"; break;
+            case 3: field = "Order";break;
+            case 4: field = "Anouncements"; break;
+            default: field="Unknown";break;
+        }
+        return(
+            <div className={field}>{field}</div>
+        )
+    }
+    function para(text){
+        if(text.length>100){
+            return(
+                <span>{text.substring(0,100)} ...</span>
+            )
+        }
+        else{
+            return(
+                <span>{text}</span>
+            )
+        }
+    }
+
+    async function updateUnread(id){
+        if (connection.connectionStarted) {
+            try {
+                    await connection.invoke('PerformAction',[id],"unread");
+            }
+            catch(e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+    }
+    async function deleteAlert(id){
+        if (connection.connectionStarted) {
+            try {
+                    await connection.invoke('PerformAction',[id],"delete");
+                    handleClose();
+                    send(filterState);
+            }
+            catch(e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+    }
+    const classes = useStyles();
+    const serachClasses = useStylesSearch();
+    // getModalStyle is not a pure function, we roll the style only on the first render
+    const [modalStyle] = React.useState(getModalStyle);
+    function getModelUi(){
+        if(modelUi){
+            return(
+            <div style={modalStyle} className={classes.paper}>
+                <div className="headerLine">
+                    <h2 id="simple-modal-title">{modelUi.title}</h2>
+                </div>
+                <p id="simple-modal-description">
+                    {modelUi.body}
+                </p>
+                <div className="modelBelow">
+                    <div>{getCategory(modelUi.category)}</div>
+                    <span>Added on {getTime(modelUi.addedOn)}</span>
+                </div>
+                <div className="modelFooter">
+                <Button onClick={()=> updateUnread(modelUi.notification_id)} color="primary" >
+                    Mark as Unread
+                </Button>
+                <Button onClick={()=> deleteAlert(modelUi.notification_id)} color="primary" >
+                    Delete
+                </Button>
+                </div>
+            </div>
+            )
+        }
+        else
+            return(<span></span>);
+    }
+    async function deleverAll(message){
+        let ids = [];
+        message.forEach(element => {
+            ids.push(element.notification_id);
+        });
+        if (connection.connectionStarted) {
+            try {
+                if(ids.length>0)
+                    await connection.invoke('PerformAction',ids,"deliver");
+            }
+            catch(e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+    }
+    async function popUp(alertData){
+        if (connection.connectionStarted) {
+            try {
+                await connection.invoke('PerformAction',[alertData.notification_id],"read");
+            }
+            catch(e) {
+                console.log(e);
+            }
+        }
+        else {
+            alert('No connection to server yet.');
+        }
+        setModelui(alertData);
+        setModelOpen(true)
+    }
+    const handleClose = () => {
+        setModelOpen(false);
+    };
+    function searchTextBased(){
+        var newArr = allAlerts.filter(alert => alert.title.toLowerCase().includes(value.toLowerCase()) || alert.body.toLowerCase().includes(value.toLowerCase()));
+        setAlerts(newArr);
+    }
+    const editSearch = (event) => {
+        setValue(event.target.value);
+    }
     const filteredAlerts = alerts.filter((a) => sortSettings.filters.includes(a.category))
     const sortedAlerts = sortSettings.sort === 1 ? filteredAlerts.reverse() : filteredAlerts
 
-    if (isDisplay)
+
         return (
             <>
                 <Sort open={open} onClose={() => setOpen(false)} settings={sortSettings}
                     setSortSettings={setSortSortSettings} />
+                <Modal
+                    open={ModelOpen}
+                    onClose={handleClose}
+                    aria-labelledby="simple-modal-title"
+                    aria-describedby="simple-modal-description"
+                >
+                    {getModelUi()}
+                </Modal>
                 <div className="notificationComponent">
                     <header className="header">Notifications</header>
                     <div className="notificationMenu">
-                        <span className="active">All</span>
-                        <span>Unread</span>
-                        <span>Announcements</span>
+                        <span className={filterState=="all" ? "active" : "nrml"} onClick={()=> updateState('all')}>All</span>
+                        <span  className={filterState=="unread" ? "active" : "nrml"} onClick={()=> updateState('unread')}>Unread</span>
+                        <span className={filterState=="anouncements" ? "active" : "nrml"} onClick={()=> updateState('anouncements')}>Anouncements</span>
                         <div>
                             <Box mt={1} >
+                                <Box p={0.5} >
+                                    {/* <IconButton onClick={() => setOpen(true)}> */}
+                                    <div onClick={() => setSearchDisplay(!displaySearch)}>
+                                        <SearchIcon />
+                                    </div>
+                                    {/* </IconButton> */}
+                                </Box>
                                 <Box p={0.5} >
                                     {/* <IconButton onClick={() => setOpen(true)}> */}
                                     <div onClick={() => setOpen(true)}>
@@ -53,22 +320,35 @@ const Notification = ({ isDisplay, alert }) => {
                                     </div>
                                     {/* </IconButton> */}
                                 </Box>
+                                
                                 {/* <Box p={0.5}>
                                     <SearchIcon />
                                 </Box> */}
                             </Box>
                         </div>
                     </div>
-                    <div>
+                    <div className={"searchMenu " + (displaySearch ? "displaySearch" : "hideSearch")}>
+                        <Input className="searchClass"
+                            id="input-with-icon-adornment" placeholder="search here" onChange={editSearch}
+                            endAdornment={
+                                <InputAdornment position="start">
+                                   <IconButton onClick={()=> searchTextBased()} aria-label="search">
+                                        <SearchIcon />
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                        />
+                        </div>
+                    <div className="notificationList wrapper">
                         {sortedAlerts.map(alert => (
-                            <div className="notificationItem">
+                            <div key = {alert.notification_id}className={"notificationItem " + (alert.readyn == 0 ? "highlight" : "nrml")} onClick={()=> popUp(alert)}>
                                 <div className="headerLine">
-                                    <p className="title"><input type="radio" className="radioBtn" />{alert.title}</p>
-                                    <p className="body">{alert.body}</p>
+                                    <p className="title">{alert.title}</p>
+                                    <p className="body">{para(alert.body)}</p>
                                 </div>
                                 <div className="footer">
-                                    <button className="forecast">Forecast</button>
-                                    <span>6.19 AM</span>
+                                    {getCategory(alert.category)}
+                                    <span>{getTime(alert.addedOn)}</span>
                                 </div>
                             </div>
                         ))}
@@ -76,10 +356,6 @@ const Notification = ({ isDisplay, alert }) => {
                 </div>
             </>
         )
-    else
-        return (<div>
-
-        </div>)
 
 }
 
